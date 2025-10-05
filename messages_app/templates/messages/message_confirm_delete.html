@@ -1,0 +1,7 @@
+<h1>Удалить сообщение</h1>
+<p>Вы уверены, что хотите удалить "{{ message.subject }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Да, удалить</button>
+</form>
+<a href="{% url 'message_list' %}">Отмена</a>

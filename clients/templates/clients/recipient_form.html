@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% load form_tags %}
+
+{% block title %}Форма получателя{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">{% if form.instance.pk %}Редактирование{% else %}Создание{% endif %} получателя</h2>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="{{ form.full_name.id_for_label }}" class="form-label">ФИО</label>
+            {{ form.full_name|add_class:"form-control" }}
+            {% if form.full_name.errors %}
+                <div class="text-danger">
+                    {{ form.full_name.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+            {{ form.email|add_class:"form-control" }}
+            {% if form.email.errors %}
+                <div class="text-danger">
+                    {{ form.email.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.comment.id_for_label }}" class="form-label">Комментарий</label>
+            {{ form.comment|add_class:"form-control" }}
+            {% if form.comment.errors %}
+                <div class="text-danger">
+                    {{ form.comment.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'clients:list' %}" class="btn btn-secondary">Назад</a>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
