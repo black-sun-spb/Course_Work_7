@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<h1>Статистика рассылок</h1>
+<ul class="list-group mb-3">
+    <li class="list-group-item">Всего рассылок: {{ total_mailings }}</li>
+    <li class="list-group-item">Активные рассылки: {{ active_mailings }}</li>
+    <li class="list-group-item">Уникальные получатели: {{ unique_recipients }}</li>
+    <li class="list-group-item">Успешные попытки: {{ successful_attempts }}</li>
+    <li class="list-group-item">Неуспешные попытки: {{ failed_attempts }}</li>
+    <li class="list-group-item">Всего отправленных сообщений: {{ total_sent_messages }}</li>
+</ul>
+{% endblock %}

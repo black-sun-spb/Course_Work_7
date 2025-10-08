@@ -1,0 +1,49 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+.env
+venv/
+
+# Django database
+*.sqlite3
+
+# Django migrations
+*/migrations/*.pyc
+*/migrations/*.pyo
+*/migrations/__pycache__/
+# оставляем __init__.py
+!*/migrations/__init__.py
+
+# Media and static files
+media/
+staticfiles/
+static_root/
+
+# Logs
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Pytest
+.cache/
+.pytest_cache/
+
+# Windows
+Thumbs.db

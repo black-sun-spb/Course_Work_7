@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Дашборд{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Дашборд</h1>
+
+<div class="row g-4">
+    <!-- Всего рассылок -->
+    <div class="col-md-3">
+        <div class="card text-bg-primary h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-envelope fs-1 me-3"></i>
+                        <div>
+                            <h5 class="card-title mb-0">Всего рассылок</h5>
+                            <p class="card-text fs-2">{{ total_mailings }}</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'mailings:list' %}" class="btn btn-light mt-3">Перейти к рассылкам</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Активные рассылки -->
+    <div class="col-md-3">
+        <div class="card text-bg-success h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-play-circle fs-1 me-3"></i>
+                        <div>
+                            <h5 class="card-title mb-0">Активные</h5>
+                            <p class="card-text fs-2">{{ active_mailings }}</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'mailings:list' %}" class="btn btn-light mt-3">Посмотреть</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уникальные получатели -->
+    <div class="col-md-3">
+        <div class="card text-bg-warning h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-people fs-1 me-3"></i>
+                        <div>
+                            <h5 class="card-title mb-0">Получатели</h5>
+                            <p class="card-text fs-2">{{ unique_recipients }}</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'clients:list' %}" class="btn btn-light mt-3">Перейти</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Неотправленные / ошибки -->
+    <div class="col-md-3">
+        <div class="card text-bg-danger h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle fs-1 me-3"></i>
+                        <div>
+                            <h5 class="card-title mb-0">Ошибки</h5>
+                            <p class="card-text fs-2">{{ failed_attempts|default:0 }}</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'mailings:statistics' %}" class="btn btn-light mt-3">Статистика</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <a href="{% url 'mailings:create' %}" class="btn btn-primary btn-lg">Создать рассылку</a>
+    <a href="{% url 'clients:create' %}" class="btn btn-secondary btn-lg">Добавить получателя</a>
+</div>
+{% endblock %}
