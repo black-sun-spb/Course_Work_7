@@ -23,7 +23,7 @@ def is_manager(user):
 class MessageListView(LoginRequiredMixin, ListView):
     model = Message
     template_name = 'messages_app/message_list.html'
-    context_object_name = 'messages'
+    context_object_name = 'messages_app'
 
     def get_queryset(self):
         if is_manager(self.request.user):

@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Group, Permission
 from django.apps import apps
 
+
 class Command(BaseCommand):
     help = 'Создает группу "Менеджеры" и назначает необходимые права'
 
@@ -21,7 +22,6 @@ class Command(BaseCommand):
         ]
 
         for app_label, model_name in models_to_assign:
-            model = apps.get_model(app_label, model_name)
             perms = Permission.objects.filter(content_type__app_label=app_label, content_type__model=model_name)
             group.permissions.add(*perms)
 

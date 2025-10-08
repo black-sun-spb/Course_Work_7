@@ -133,6 +133,15 @@ CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
         'LOCATION': 'redis://127.0.0.1:6379/1',
-        'OPTIONS': {'CLIENT_CLASS': 'django_redis.client.DefaultClient'},
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
     }
 }
+
+AUTH_USER_MODEL = 'users.CustomUser'
+
+# settings.py
+LOGIN_URL = '/users/login/'  # путь к странице входа
+LOGIN_REDIRECT_URL = '/'      # куда перенаправлять после входа
+LOGOUT_REDIRECT_URL = '/users/login/'  # куда перенаправлять после выхода

@@ -11,4 +11,3 @@ urlpatterns = [
     path('<int:pk>/send/', views.MailingSendNowView.as_view(), name='send_now'),
     path('statistics/', views.MailingStatisticsView.as_view(), name='statistics'),
 ]
-

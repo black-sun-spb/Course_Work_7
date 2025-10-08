@@ -1,18 +1,32 @@
 from django import forms
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import UserCreationForm
+from .models import CustomUser
 
 
-class UserRegisterForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    password2 = forms.CharField(widget=forms.PasswordInput, label="Повторите пароль")
+class UserRegisterForm(UserCreationForm):
+    """Форма регистрации нового пользователя"""
+    email = forms.EmailField(label="Email", required=True)
 
     class Meta:
-        model = User
-        fields = ('username', 'email', 'password', 'password2')
+        model = CustomUser
+        fields = ('username', 'email', 'password1', 'password2')
 
-    def clean_password2(self):
-        cd = self.cleaned_data
-        if cd['password'] != cd['password2']:
-            raise forms.ValidationError("Пароли не совпадают")
-        return cd['password2']
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError("Пользователь с таким email уже существует.")
+        return email
+
+
+class ProfileForm(forms.ModelForm):
+    """Форма редактирования профиля"""
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', 'phone', 'city', 'avatar')
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'avatar': forms.FileInput(attrs={'class': 'form-control'}),
+        }
