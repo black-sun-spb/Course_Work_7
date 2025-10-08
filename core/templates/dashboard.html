@@ -78,8 +78,10 @@
     </div>
 </div>
 
-<div class="mt-4 d-flex gap-2">
+<div class="mt-4 d-flex gap-2 flex-wrap">
     <a href="{% url 'mailings:create' %}" class="btn btn-primary btn-lg">Создать рассылку</a>
     <a href="{% url 'clients:create' %}" class="btn btn-secondary btn-lg">Добавить получателя</a>
+    <a href="{% url 'users:profile_view' %}" class="btn btn-info btn-lg">Просмотр профиля</a>
+    <a href="{% url 'users:profile_edit' %}" class="btn btn-warning btn-lg">Редактировать профиль</a>
 </div>
 {% endblock %}
