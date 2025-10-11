@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from mailings.models import Mailing
 from mailings.views import send_message
 
+
 class Command(BaseCommand):
     help = 'Отправка активных рассылок'
 

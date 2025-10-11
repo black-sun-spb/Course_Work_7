@@ -1,15 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.cache import cache_page
+from django.conf import settings
+from django.core.cache import cache
 from .models import Recipient
 from .forms import RecipientForm
+
 
 # --- Проверка роли менеджера ---
 def is_manager(user):
     return user.groups.filter(name='Managers').exists()
 
 
-@login_required
+# --- Декоратор для редиректа на login ---
+login_decorator = login_required(login_url=settings.LOGIN_URL)
+
+
+@login_decorator
 @cache_page(60 * 5)  # кешируем список получателей на 5 минут
 def recipient_list(request):
     """Список получателей"""
@@ -17,7 +24,7 @@ def recipient_list(request):
     return render(request, 'clients/recipient_list.html', {'recipients': recipients})
 
 
-@login_required
+@login_decorator
 def recipient_create(request):
     """Создание нового получателя"""
     if request.method == 'POST':
@@ -28,7 +35,6 @@ def recipient_create(request):
             recipient.save()
             form.save_m2m()
             # Очистка кеша списка после добавления нового получателя
-            from django.core.cache import cache
             cache.clear()
             return redirect('clients:list')
     else:
@@ -36,7 +42,7 @@ def recipient_create(request):
     return render(request, 'clients/recipient_form.html', {'form': form})
 
 
-@login_required
+@login_decorator
 def recipient_update(request, pk):
     """Редактирование получателя"""
     recipient = get_object_or_404(Recipient, pk=pk)
@@ -47,8 +53,6 @@ def recipient_update(request, pk):
         form = RecipientForm(request.POST, instance=recipient)
         if form.is_valid():
             form.save()
-            # Очистка кеша после изменения
-            from django.core.cache import cache
             cache.clear()
             return redirect('clients:list')
     else:
@@ -57,7 +61,7 @@ def recipient_update(request, pk):
     return render(request, 'clients/recipient_form.html', {'form': form})
 
 
-@login_required
+@login_decorator
 def recipient_delete(request, pk):
     """Удаление получателя"""
     recipient = get_object_or_404(Recipient, pk=pk)
@@ -66,8 +70,6 @@ def recipient_delete(request, pk):
 
     if request.method == 'POST':
         recipient.delete()
-        # Очистка кеша после удаления
-        from django.core.cache import cache
         cache.clear()
         return redirect('clients:list')
 

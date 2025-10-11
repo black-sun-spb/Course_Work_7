@@ -6,12 +6,14 @@ from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.contrib import messages
+from django.conf import settings
 
 from .models import Mailing, MailingAttempt
 from messages_app.models import Message
 from clients.models import Recipient
 
 logger = logging.getLogger(__name__)
+
 
 # --- Проверка роли менеджера ---
 def is_manager(user):
@@ -20,6 +22,8 @@ def is_manager(user):
 
 # --- CRUD рассылок ---
 class MailingListView(LoginRequiredMixin, ListView):
+    login_url = settings.LOGIN_URL
+    redirect_field_name = 'next'
     model = Mailing
     template_name = 'mailings/mailing_list.html'
     context_object_name = 'mailings'
@@ -31,6 +35,8 @@ class MailingListView(LoginRequiredMixin, ListView):
 
 
 class MailingCreateView(LoginRequiredMixin, CreateView):
+    login_url = settings.LOGIN_URL
+    redirect_field_name = 'next'
     model = Mailing
     fields = ['message', 'recipients', 'start_datetime', 'end_datetime']
     template_name = 'mailings/mailing_form.html'
@@ -38,10 +44,13 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
+        messages.success(self.request, 'Рассылка успешно создана!')
         return super().form_valid(form)
 
 
 class MailingUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = settings.LOGIN_URL
+    redirect_field_name = 'next'
     model = Mailing
     fields = ['message', 'recipients', 'start_datetime', 'end_datetime']
     template_name = 'mailings/mailing_form.html'
@@ -52,8 +61,14 @@ class MailingUpdateView(LoginRequiredMixin, UpdateView):
             return Mailing.objects.all()
         return Mailing.objects.filter(owner=self.request.user)
 
+    def form_valid(self, form):
+        messages.success(self.request, 'Рассылка успешно обновлена!')
+        return super().form_valid(form)
+
 
 class MailingDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = settings.LOGIN_URL
+    redirect_field_name = 'next'
     model = Mailing
     template_name = 'mailings/mailing_confirm_delete.html'
     success_url = reverse_lazy('mailings:list')
@@ -62,6 +77,10 @@ class MailingDeleteView(LoginRequiredMixin, DeleteView):
         if is_manager(self.request.user):
             return Mailing.objects.all()
         return Mailing.objects.filter(owner=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Рассылка удалена!')
+        return super().delete(request, *args, **kwargs)
 
 
 # --- Отправка сообщений ---
@@ -80,7 +99,11 @@ def send_message(mailing: Mailing):
             mailing=mailing,
             recipient_email=client.email,
         )
-        attempt.send_email()  # метод модели MailingAttempt
+        attempt.send_email()
+        if attempt.status == 'success':
+            logger.info(f"Письмо отправлено: {client.email}")
+        else:
+            logger.error(f"Ошибка отправки письма {client.email}: {attempt.server_response}")
 
     mailing.status = 'started'
     mailing.save()
@@ -89,6 +112,9 @@ def send_message(mailing: Mailing):
 
 class MailingSendNowView(LoginRequiredMixin, View):
     """Отправка рассылки по кнопке 'Отправить'."""
+    login_url = settings.LOGIN_URL
+    redirect_field_name = 'next'
+
     def get(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)
 
@@ -103,6 +129,8 @@ class MailingSendNowView(LoginRequiredMixin, View):
 
 # --- Статистика и отчеты с кешированием ---
 class MailingStatisticsView(LoginRequiredMixin, TemplateView):
+    login_url = settings.LOGIN_URL
+    redirect_field_name = 'next'
     template_name = 'mailings/mailing_statistics.html'
 
     def get_context_data(self, **kwargs):
@@ -111,7 +139,11 @@ class MailingStatisticsView(LoginRequiredMixin, TemplateView):
         stats = cache.get(user_key)
 
         if not stats:
-            mailings = Mailing.objects.all() if is_manager(self.request.user) else Mailing.objects.filter(owner=self.request.user)
+            mailings = (
+                Mailing.objects.all()
+                if is_manager(self.request.user)
+                else Mailing.objects.filter(owner=self.request.user)
+            )
             stats = {
                 'total_mailings': mailings.count(),
                 'active_mailings': mailings.filter(status='started').count(),

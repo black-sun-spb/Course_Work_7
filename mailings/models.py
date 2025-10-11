@@ -4,7 +4,6 @@ from messages_app.models import Message
 from clients.models import Recipient
 from django.core.mail import send_mail
 from django.conf import settings
-from django.contrib.auth.models import User
 
 
 class Mailing(models.Model):
@@ -22,7 +21,12 @@ class Mailing(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mailings')
+    owner = models.ForeignKey(
+        settings.
+        AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='mailings'
+    )
 
     def save(self, *args, **kwargs):
         now = timezone.now()

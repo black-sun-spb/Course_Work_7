@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class Recipient(models.Model):
@@ -7,12 +7,11 @@ class Recipient(models.Model):
     full_name = models.CharField("ФИО", max_length=255, blank=True)
     comment = models.TextField("Комментарий", blank=True)
     owner = models.ForeignKey(
-        User,
+        settings.
+        AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='recipients',
-        verbose_name="Владелец"
+        related_name='recipients'
     )
-
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -24,7 +23,6 @@ class Recipient(models.Model):
         permissions = [
             ("can_manage_recipients", "Может управлять получателями"),
         ]
-
 
     def __str__(self):
         return f"{self.full_name} <{self.email}>"
