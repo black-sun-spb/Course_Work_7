@@ -20,8 +20,7 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False  # до активации по email
-            user.set_password(form.cleaned_data['password'])
+            user.is_active = False
             user.save()
 
             # Отправка письма активации
